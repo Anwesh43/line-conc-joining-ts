@@ -79,3 +79,34 @@ class Animator {
         }
     }
 }
+
+const divideScale : Function = (scale : number, i : number, n : number) : number => {
+    return Math.min(1/n, Math.max(0, scale - (1/n) * i)) * n
+}
+
+const drawLCJNode : Function = (context : CanvasRenderingContext2D, i : number, scale : number) => {
+    const gap : number = w / (nodes + 1)
+    const size : number = gap / 3
+    const lineGap : number = size / lines
+    const dr : number = size / 2
+    const sc1 : number = divideScale(scale, 0, 2)
+    const sc2 : number = divideScale(scale, 1, 2)
+    const deg : number = (Math.PI) / lines
+    context.save()
+    context.translate(gap * (1 + this.i), h/2)
+    for (var i = 0; i < lines; i++) {
+        const sc : number = divideScale(sc2, i, lines)
+        context.save()
+        context.rotate(2 * deg * i)
+        const sr : number = lineGap * (i + 1)
+        const r = sr + (dr - sr) * sc
+        const y : number = r * Math.sin(deg)
+        const wr : number = r * Math.cos(deg)
+        context.beginPath()
+        context.moveTo(-wr * sc, y)
+        context.lineTo(wr * sc, y)
+        context.stroke()
+        context.restore()
+    }
+    context.restore()
+}
