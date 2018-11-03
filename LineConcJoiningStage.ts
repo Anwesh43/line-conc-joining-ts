@@ -44,7 +44,9 @@ class State {
     update(cb : Function) {
         const k = Math.floor(this.scale / 0.5)
         const p = k * 0.05 + (1 - k) * (0.05) / lines
+        console.log(p)
         this.scale += p * this.dir
+        //console.log(this.scale)
         if (Math.abs(this.scale - this.prevScale) > 1) {
             this.scale = this.prevScale + this.dir
             this.dir = 0
@@ -94,16 +96,19 @@ const drawLCJNode : Function = (context : CanvasRenderingContext2D, i : number, 
     const sc1 : number = divideScale(scale, 0, 2)
     const sc2 : number = divideScale(scale, 1, 2)
     const deg : number = (Math.PI) / lines
+    context.lineCap = 'round'
+    context.lineWidth = Math.min(w, h) / 60
+    context.strokeStyle = '#1A237E'
     context.save()
-    context.translate(gap * (1 + this.i), h/2)
+    context.translate(gap * (1 + i), h/2)
     for (var i = 0; i < lines; i++) {
-        const sc : number = divideScale(sc2, i, lines)
+        const sc : number = divideScale(sc1, i, lines)
         context.save()
         context.rotate(2 * deg * i)
         const sr : number = lineGap * (i + 1)
         const r = sr + (dr - sr) * sc2
         const y : number = r * Math.sin(deg)
-        const wr : number = r * Math.cos(deg)
+        const wr : number = 2 * dr * Math.cos(deg)
         context.beginPath()
         context.moveTo(-wr * sc, y)
         context.lineTo(wr * sc, y)
@@ -129,9 +134,9 @@ class LCJNode {
     }
 
     draw(context : CanvasRenderingContext2D) {
-        drawLCJNode(context)
-        if (this.next) {
-            this.next.draw(context)
+        drawLCJNode(context, this.i, this.state.scale)
+        if (this.prev) {
+            this.prev.draw(context)
         }
     }
 
