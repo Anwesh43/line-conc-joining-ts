@@ -157,7 +157,7 @@ class LCJNode {
 class LineConcJoining {
     curr : LCJNode = new LCJNode(0)
     dir : number = 1
-    
+
     draw(context : CanvasRenderingContext2D) {
         this.curr.draw(context)
     }
@@ -173,5 +173,26 @@ class LineConcJoining {
 
     startUpdating(cb : Function) {
         this.curr.startUpdating(cb)
+    }
+}
+
+class Renderer {
+    lcj : LineConcJoining = new LineConcJoining()
+    animator : Animator = new Animator()
+
+    render(context) {
+        this.lcj.draw(context)
+    }
+
+    handleTap(cb : Function) {
+        this.lcj.startUpdating(() => {
+            this.animator.start(() => {
+                cb()
+                this.lcj.update(() => {
+                    this.animator.stop()
+                    cb()
+                })
+            })
+        })
     }
 }
