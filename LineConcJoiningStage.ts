@@ -99,7 +99,7 @@ const drawLCJNode : Function = (context : CanvasRenderingContext2D, i : number, 
         context.save()
         context.rotate(2 * deg * i)
         const sr : number = lineGap * (i + 1)
-        const r = sr + (dr - sr) * sc
+        const r = sr + (dr - sr) * sc2
         const y : number = r * Math.sin(deg)
         const wr : number = r * Math.cos(deg)
         context.beginPath()
@@ -109,4 +109,47 @@ const drawLCJNode : Function = (context : CanvasRenderingContext2D, i : number, 
         context.restore()
     }
     context.restore()
+}
+
+class LCJNode {
+    next : LCJNode
+    prev : LCJNode
+    state : State = new State()
+    constructor(private i : number) {
+        this.addNeighbor()
+    }
+
+    addNeighbor() {
+        if (this.i < nodes - 1) {
+            this.next = new LCJNode(this.i + 1)
+            this.next.prev = this
+        }
+    }
+
+    draw(context : CanvasRenderingContext2D) {
+        drawLCJNode(context)
+        if (this.next) {
+            this.next.draw(context)
+        }
+    }
+
+    update(cb : Function) {
+        this.state.update(cb)
+    }
+
+    startUpdating(cb : Function) {
+        this.state.startUpdating(cb)
+    }
+
+    getNext(dir : number, cb : Function) : LCJNode {
+        var curr : LCJNode = this.prev
+        if (dir == 1) {
+            curr = this.next
+        }
+        if (curr) {
+            return curr
+        }
+        cb()
+        return this
+    }
 }
